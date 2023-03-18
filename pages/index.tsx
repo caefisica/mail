@@ -2,10 +2,30 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
+import { useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Home() {
+const Home = () => {
+  const [recipient, setRecipient] = useState('');
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const postData = async () => {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ recipient }),
+      });
+      return response.json();
+    };
+    postData().then((data) => {
+      alert(data.message);
+    });
+  }
+  
   return (
     <>
       <Head>
@@ -37,6 +57,19 @@ export default function Home() {
               />
             </a>
           </div>
+        </div>
+
+        <div className={styles.center}>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="email"
+              value={recipient}
+              onChange={(e) => setRecipient(e.target.value)}
+              placeholder="Recipient's email"
+              required
+            />
+            <button type="submit">Send Email</button>
+          </form>
         </div>
 
         <div className={styles.center}>
@@ -121,3 +154,5 @@ export default function Home() {
     </>
   )
 }
+
+export default Home;
